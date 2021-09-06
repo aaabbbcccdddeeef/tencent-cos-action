@@ -39,7 +39,7 @@ jobs:
       - name: Upload COS
         uses: XUEGAONET/tencent-cos-action@v0.2.0
         with:
-          args: upload -rs --delete ./public/ /
+          args: upload -rsf --delete ./public/ /
           secret_id: ${{ secrets.TENCENT_CLOUD_SECRET_ID }}
           secret_key: ${{ secrets.TENCENT_CLOUD_SECRET_KEY }}
           bucket: ${{ secrets.COS_BUCKET }}
@@ -57,3 +57,33 @@ jobs:
 | secret_id | 是 | 从 [控制台-API密钥管理](https://console.cloud.tencent.com/cam/capi) 获取 |
 | secret_key | 是 | 同上 |
 | bucket | 是 | 对象存储桶的名称，包含后边的数字 |
+
+## 博客等静态网站场景
+
+由于万恶的腾讯云的cli工具的设计缺陷，全球加速同步删除时会无法删除成功。这种情况下，将就了一下有个解决办法，就是同步两次。
+
+大概思路就是：
+* 第一次同步，使用本仓库的全球加速，同步文件，但是会提示删除失败，不影响
+* 第二次同步，使用本仓库的上游仓库（地域），同步文件，再进行删除
+
+推送对时间敏感，但是删除不敏感，因此多出来的文件，即便网络状况不佳时删除失败了，但是可以等待下一次Action触发时删除，不会影响这一次的更新。
+
+参考step如下：
+```yaml
+      - name: Upload to Accelerate COS
+        uses: XUEGAONET/tencent-cos-action@v0.2.0
+        with:
+          args: upload -rsf --delete ./public/ /
+          secret_id: ${{ secrets.TENCENT_CLOUD_SECRET_ID }}
+          secret_key: ${{ secrets.TENCENT_CLOUD_SECRET_KEY }}
+          bucket: ${{ secrets.COS_BUCKET }}
+
+      - name: Sync Deleting
+        uses: zkqiang/tencent-cos-action@v0.1.0
+        with:
+          args: upload -rsf --delete ./public/ /
+          secret_id: ${{ secrets.TENCENT_CLOUD_SECRET_ID }}
+          secret_key: ${{ secrets.TENCENT_CLOUD_SECRET_KEY }}
+          bucket: ${{ secrets.COS_BUCKET }}
+          region: ap-guangzhou
+```
