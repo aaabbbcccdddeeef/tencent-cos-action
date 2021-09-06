@@ -4,6 +4,8 @@
 [coscmd](https://cloud.tencent.com/document/product/436/10976)
 工具，实现对象存储的批量上传、下载、删除等操作。
 
+该仓库为修改版，非官方发布（官方仓库的Action压根就不能用）。仅支持全球加速，适合博客等个人建站使用
+
 ## workflow 示例
 
 在目标仓库中创建 `.github/workflows/xxx.yml` 即可，文件名任意，配置参考如下：
@@ -35,19 +37,15 @@ jobs:
         run: yarn && yarn build
 
       - name: Upload COS
-        uses: zkqiang/tencent-cos-action@v0.1.0
+        uses: XUEGAONET/tencent-cos-action@v0.2.0
         with:
-          args: delete -r -f / && upload -r ./dist/ /
-          secret_id: ${{ secrets.SECRET_ID }}
-          secret_key: ${{ secrets.SECRET_KEY }}
-          bucket: ${{ secrets.BUCKET }}
-          region: ap-shanghai
+          args: upload -rs --delete ./public/ /
+          secret_id: ${{ secrets.TENCENT_CLOUD_SECRET_ID }}
+          secret_key: ${{ secrets.TENCENT_CLOUD_SECRET_KEY }}
+          bucket: ${{ secrets.COS_BUCKET }}
 ```
 
-其中 `${{ secrets.SECRET_XXX }}` 是调用 settings 配置的密钥，防止公开代码将权限密钥暴露，添加方式如下：
-
-![](https://static.zkqiang.cn/images/20200118171056.png-slim)
-
+其中 `${{ secrets.XXXXXXX }}` 是调用 settings 配置的密钥，防止公开代码将权限密钥暴露，需要自行前往仓库的设置中添加
 ## 相关参数
 
 以下参数均可参见
@@ -55,8 +53,7 @@ jobs:
 
 | 参数 | 是否必传 | 备注 |
 | --- | --- | --- |
-| args | 是 | coscmd 命令参数，参见官方文档，多个命令用 ` && ` 隔开<br>如 `delete -r -f / && upload -r ./dist/ /` |
+| args | 是 | coscmd 命令参数，参见官方文档，多个命令用 ` && ` 隔开<br>如 `upload -rs --delete ./public/ /` |
 | secret_id | 是 | 从 [控制台-API密钥管理](https://console.cloud.tencent.com/cam/capi) 获取 |
 | secret_key | 是 | 同上 |
 | bucket | 是 | 对象存储桶的名称，包含后边的数字 |
-| region | 是 | 对象存储桶的地区，[参见文档](https://cloud.tencent.com/document/product/436/6224) |

@@ -1,6 +1,6 @@
-name: 'Tencent COS Action'
-description: 'GitHub Action for Tencent COS Command (coscmd)'
-author: 'zkqiang <zkqiang@126.com>'
+name: 'Tencent Accelerate COS Action(unofficial)'
+description: 'GitHub Action for Tencent COS Command (coscmd) 全球加速域名专用，支持差异同步，适合静态网站'
+author: 'Harris <i@xuegaogg.com>'
 branding:
   icon: 'cloud'
   color: 'blue'
@@ -16,9 +16,6 @@ inputs:
     required: true
   bucket:
     description: 'COS bucket name'
-    required: true
-  region:
-    description: 'COS bucket region, detail: https://cloud.tencent.com/document/product/436/6224'
     required: true
 runs:
   using: 'docker'
